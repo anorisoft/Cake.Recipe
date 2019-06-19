@@ -18,7 +18,7 @@ git rm -r Resources
 powershell write-host
 
 powershell write-host -fore Yellow "Adding Resources Submodule from git.
-git submodule add -f https://github.com/cake-build/resources.git Resources
+git submodule add -f https://github.com/anorisoft/Cake.Resources.git Resources
 powershell write-host
 
 
