@@ -1,0 +1,6 @@
+[submodule "Tools/Resources"]
+	path = Tools/Resources
+	url = https://github.com/cake-build/resources.git
+[submodule "Tools/GlobalSettings"]
+	path = Tools/GlobalSettings
+	url = https://gitserver.home/AnoriGit/GlobalSettings.git
