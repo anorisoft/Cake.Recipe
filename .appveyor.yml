@@ -2,7 +2,7 @@
 #  Build Script                   #
 #---------------------------------#
 build_script:
-  - cmd: build.cmd
+  - ps: .\Tools\Resources\build.ps1
 
 # Tests
 test: off
