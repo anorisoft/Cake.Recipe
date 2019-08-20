@@ -7,7 +7,9 @@ build_script:
 
 # Install
 install:
-  - git submodule update --init --recursive
+#  - git submodule update --init --recursive+ 
+  - git submodule init
+  - git submodule update
 
 # Tests
 test: off
