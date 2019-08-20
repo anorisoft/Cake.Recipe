@@ -13,9 +13,9 @@ install:
   - dir /s
 
 clone_script:
-- cmd: git clone -q https://github.com/$env:appveyor_repo_name.git $env:appveyor_build_folder
-- cmd: git fetch -q origin +refs/pull/$env:appveyor_pull_request_number/merge:
-- cmd: git checkout -qf FETCH_HEAD
+- PS: git clone -q https://github.com/$env:appveyor_repo_name.git $env:appveyor_build_folder
+- PS: git fetch -q origin +refs/pull/$env:appveyor_pull_request_number/merge:
+- PS: git checkout -qf FETCH_HEAD
 - cmd: dir /s
 # Tests
 test: off
