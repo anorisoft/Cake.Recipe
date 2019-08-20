@@ -16,7 +16,7 @@ More about Cake at http://cakebuild.net
 
 |Develop|Master|
 |:--:|:--:|
-|[![Build status](https://ci.appveyor.com/api/projects/status/4k79ooagf4ofmvum/branch/develop?svg=true)](https://ci.appveyor.com/project/cakecontrib/cake-recipe/branch/develop)|[![Build status](https://ci.appveyor.com/api/projects/status/uofoe54t82jvovaf/branch/develop?svg=true)](https://ci.appveyor.com/project/cakecontrib/cake-recipe/branch/master)|
+|[![Build status](https://ci.appveyor.com/api/projects/status/4k79ooagf4ofmvum/branch/develop?svg=true)](https://ci.appveyor.com/project/anorisoft/cake-recipe/branch/develop)|[![Build status](https://ci.appveyor.com/api/projects/status/4k79ooagf4ofmvum/branch/develop?svg=true)](https://ci.appveyor.com/project/anorisoft/cake-recipe/branch/master)|
 
 
 ## Quick Links
