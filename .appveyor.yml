@@ -3,6 +3,11 @@
 #---------------------------------#
 build_script:
   - ps: .\Tools\Resources\build.ps1
+  
+
+# Install
+install:
+  - git submodule update --init --recursive
 
 # Tests
 test: off
