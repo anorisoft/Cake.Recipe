@@ -2,7 +2,7 @@
 #  Build Script                   #
 #---------------------------------#
 build_script:
-  - ps: .\Tools\Resources\build.ps1
+  - cmd: build.cmd
   
 
 # Install
