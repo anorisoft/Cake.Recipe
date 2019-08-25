@@ -8,7 +8,7 @@ BuildParameters.SetParameters(
 	buildSystem: BuildSystem,
 	sourceDirectoryPath: "./Source",
 	title: "Anori.Cake.Recipe",
-	forcePublishNuGet: true,
+//	forcePublishNuGet: true,
 	repositoryOwner: "anorisoft",
 	repositoryName: "Anori.Cake.Recipe",
 	appVeyorAccountName: "anorisoft",
