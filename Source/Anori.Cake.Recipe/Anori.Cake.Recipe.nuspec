@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>Anori.Cake.Recipe</id>
+    <version>0.1.35</version>
+    <authors>Martin Egli</authors>
+    <owners>Martin Egli</owners>
+    <description>Re-usable build script for Cake that can be used for numerous projects.</description>
+    <iconUrl>https://cdn.rawgit.com/cake-contrib/graphics/a5cf0f881c390650144b2243ae551d5b9f836196/png/cake-contrib-medium.png</iconUrl>
+    <tags>Default Build Cake</tags>
+  </metadata>
+</package>

@@ -1,0 +1,40 @@
+#---------------------------------#
+#  Build Script                   #
+#---------------------------------#
+build_script:
+  - cmd: build.cmd
+  
+
+# Install
+install:
+#  - git submodule update --init --recursive+ 
+#  - git submodule sync
+#  - git submodule update --init --recursive
+  - dir /s
+
+clone_script:
+  - cmd: >-
+      git clone -q --branch=%APPVEYOR_REPO_BRANCH% https://github.com/%APPVEYOR_REPO_NAME%.git %APPVEYOR_BUILD_FOLDER%
+      && cd %APPVEYOR_BUILD_FOLDER%
+      && git checkout -qf %APPVEYOR_REPO_COMMIT%
+      && git submodule update --force --recursive --init --remote
+      
+# Tests
+test: off
+
+#---------------------------------#
+#        Branches to build        #
+#---------------------------------#
+branches:
+  # Whitelist
+  only:
+    - develop
+    - master
+    - /release/.*/
+    - /hotfix/.*/
+
+#---------------------------------#
+#  Build Cache                    #
+#---------------------------------#
+cache:
+- Tools -> build.ps1
