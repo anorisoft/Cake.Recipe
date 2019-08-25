@@ -10,7 +10,7 @@ install:
 #  - git submodule update --init --recursive+ 
 #  - git submodule sync
 #  - git submodule update --init --recursive
-  - dir /s
+#  - dir /s
 
 clone_script:
   - cmd: >-
