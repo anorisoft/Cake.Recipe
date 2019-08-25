@@ -10,7 +10,7 @@ BuildParameters.SetParameters(
 	title: "Anori.Cake.Recipe",
 //	forcePublishNuGet: true,
 	repositoryOwner: "anorisoft",
-	repositoryName: "Anori.Cake.Recipe",
+	repositoryName: "Cake.Recipe",
 	appVeyorAccountName: "anorisoft",
 	shouldRunGitVersion: true, 
 	nuspecFilePath: "./Source/Anori.Cake.Recipe/Anori.Cake.Recipe.nuspec"
