@@ -38,3 +38,8 @@ branches:
 #---------------------------------#
 cache:
 - Tools -> build.ps1
+
+deploy:
+  appveyor_repo_tag: true
+  tag: $(APPVEYOR_REPO_TAG_NAME)
+  release: $(APPVEYOR_REPO_TAG_NAME)
