@@ -54,6 +54,7 @@ BuildParameters.Tasks.CreateNuGetPackageTask = Task("Create-Nuget-Package")
 
 		if(BuildParameters.NuSpecFilePath != null) {
 			Debug("NuSpecFilePath: {0}", BuildParameters.NuSpecFilePath);
+			Debug("NuSpecFilePath: {0}", BuildParameters.NuSpecFilePath);
 
 			// Create packages.
 			NuGetPack(BuildParameters.NuSpecFilePath, new NuGetPackSettings {
@@ -70,8 +71,9 @@ BuildParameters.Tasks.CreateNuGetPackageTask = Task("Create-Nuget-Package")
 			});
 		}
 		else if(BuildParameters.NuSpecFilePaths != null && BuildParameters.NuSpecFilePaths.Any()) {
-			Debug("NuSpecFilePaths: {0}", string.join(" ,", BuildParameters.NuSpecFilePaths));
-
+		Debug("NuSpecFilePaths: {0}", BuildParameters.NuSpecFilePaths);
+			
+//			Debug("NuSpecFilePaths: {0}", String.Join(" ,", BuildParameters.NuSpecFilePaths));
 			foreach(var nuSpecFilePath in BuildParameters.NuSpecFilePaths)
 			{
 				// Create packages.

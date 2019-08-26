@@ -379,8 +379,11 @@ public static class BuildParameters
         context.Information("WebLinkRoot: {0}", WebLinkRoot);
         context.Information("WebBaseEditUrl: {0}", WebBaseEditUrl);
         context.Information("NuSpecFilePath: {0}", NuSpecFilePath);
-        context.Information("NuSpecFilePaths: {0}", string.Join(", ", NuSpecFilePaths));
-        context.Information("NugetConfig: {0} ({1})", NugetConfig, context.FileExists(NugetConfig));
+		if(NuSpecFilePaths != null && NuSpecFilePaths.Any())
+		{
+			context.Information("NuSpecFilePaths: {0}", string.Join(", ", NuSpecFilePaths));
+		}
+		context.Information("NugetConfig: {0} ({1})", NugetConfig, context.FileExists(NugetConfig));
         context.Information("NuGetSources: {0}", string.Join(", ", NuGetSources));
     }
 
@@ -513,7 +516,7 @@ public static class BuildParameters
 
 		NuSpecFilePath = nuspecFilePath ?? context.MakeAbsolute(SourceDirectoryPath.CombineWithFilePath(Title + @"/" + Title + ".csproj"));
 //		NuSpecFilePath = nuspecFilePath ?? context.MakeAbsolute((FilePath)"./Cake.Recipe/Cake.Recipe.nuspec");
-		NuSpecFilePaths = nuspecFilePaths
+		NuSpecFilePaths = nuspecFilePaths;
 
         NugetConfig = context.MakeAbsolute(nugetConfig ?? (FilePath)"./NuGet.Config");
         NuGetSources = nuGetSources;
