@@ -1,4 +1,5 @@
-#load nuget:https://www.myget.org/F/cake-contrib/api/v2?package=Cake.Recipe&prerelease
+//#load nuget:https://www.myget.org/F/cake-contrib/api/v2?package=Cake.Recipe&prerelease
+#load nuget:?package=Cake.Recipe&version=1.1.0
 
 Environment.SetVariableNames();
 
@@ -9,9 +10,9 @@ BuildParameters.SetParameters(
 	sourceDirectoryPath: "./Source",
 	title: "Anori.Cake.Recipe",
 //	forcePublishNuGet: true,
-//	repositoryOwner: "Martin",
-//	repositoryName: "Anori.Cake.Recipe",
-//	appVeyorAccountName: "cakecontrib",
+	repositoryOwner: "anorisoft",
+	repositoryName: "Anori.Cake.Recipe",
+	appVeyorAccountName: "anorisoft",
 	shouldRunGitVersion: true, 
 	nuspecFilePath: "./Source/Anori.Cake.Recipe/Anori.Cake.Recipe.nuspec"
 );
