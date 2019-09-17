@@ -10,4 +10,4 @@ set command="%scriptFileName%"
 cd %scriptFolderPath%
 echo %command%
 powershell -Command %command%
-pause
+rem pause
