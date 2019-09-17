@@ -119,18 +119,6 @@ Teardown(context =>
 ///////////////////////////////////////////////////////////////////////////////
 
 
-Task("Seed")
-	.Does(() => 
-	{
-		Information("Target: {0}", BuildParameters.Target);
-		Information("Seed!");
-		var source = new DirectoryPath("Tools/RepositoryTemplate/Template");
-		Information("Source: {0}", source);
-		var target = BuildParameters.RootDirectoryPath;
-		Information("Target: {0}", target);
-		CopyDirectory​(source, target);
-	});
-
 BuildParameters.Tasks.ShowInfoTask = Task("Show-Info")
     .Does(() =>
 {
