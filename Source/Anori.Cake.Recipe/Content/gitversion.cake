@@ -77,18 +77,21 @@ public class BuildVersion
         }
 
         if (context.DirectoryExists(BuildParameters.SourceDirectoryPath)){
-		if (string.IsNullOrEmpty(version) || string.IsNullOrEmpty(semVersion))
-        {
-            context.Information("Fetching version from SolutionInfo...");
-            var assemblyInfo = context.ParseAssemblyInfo(BuildParameters.Paths.Files.SolutionInfoFilePath);
-            version = assemblyInfo.AssemblyVersion;
-            assemblyFileVersion = assemblyInfo.AssemblyVersion;
-            assemblyVersion = assemblyInfo.AssemblyVersion;
-            semVersion = assemblyInfo.AssemblyInformationalVersion;
-            informationalVersion = assemblyInfo.AssemblyInformationalVersion;
-            milestone = string.Concat(version);
-        }}
-
+			if (context.FileExists(BuildParameters.Paths.Files.SolutionInfoFilePath)){
+				if (string.IsNullOrEmpty(version) || string.IsNullOrEmpty(semVersion))
+				{
+					context.Information("Fetching version from SolutionInfo...");
+					var assemblyInfo = context.ParseAssemblyInfo(BuildParameters.Paths.Files.SolutionInfoFilePath);
+					version = assemblyInfo.AssemblyVersion;
+					assemblyFileVersion = assemblyInfo.AssemblyVersion;
+					assemblyVersion = assemblyInfo.AssemblyVersion;
+					semVersion = assemblyInfo.AssemblyInformationalVersion;
+					informationalVersion = assemblyInfo.AssemblyInformationalVersion;
+					milestone = string.Concat(version);
+				}
+			}
+		}
+		
         var cakeVersion = typeof(ICakeContext).Assembly.GetName().Version.ToString();
 
         return new BuildVersion
