@@ -8,19 +8,11 @@ BuildParameters.Tasks.CleanDocumentationTask = Task("Clean-Documentation")
     EnsureDirectoryExists(BuildParameters.WyamPublishDirectoryPath);
 });
 
-BuildParameters.Tasks.DeployGraphDocumentation = Task("Deploy-Graph-Documentation")
-    .WithCriteria(() => BuildParameters.ShouldDeployGraphDocumentation)
-    .WithCriteria(() => DirectoryExists(BuildParameters.WyamRootDirectoryPath))
-    .Does(() => {
-        Graph(Tasks).Deploy();
-    });
-
 BuildParameters.Tasks.PublishDocumentationTask = Task("Publish-Documentation")
     .IsDependentOn("Clean-Documentation")
-    .IsDependentOn("Deploy-Graph-Documentation")
-    .WithCriteria(() => BuildParameters.ShouldGenerateDocumentation)
-    .WithCriteria(() => DirectoryExists(BuildParameters.WyamRootDirectoryPath))
-    .Does(() => RequireTool(WyamTool, () => {
+    .WithCriteria(() => BuildParameters.ShouldGenerateDocumentation, "Wyam documentation has been disabled")
+    .WithCriteria(() => DirectoryExists(BuildParameters.WyamRootDirectoryPath), "Wyam documentation directory is missing")
+    .Does(() => RequireTool(ToolSettings.WyamTool, () => {
         // Check to see if any documentation has changed
         var sourceCommit = GitLogTip("./");
         Information("Source Commit Sha: {0}", sourceCommit.Sha);
@@ -30,11 +22,11 @@ BuildParameters.Tasks.PublishDocumentationTask = Task("Publish-Documentation")
 
         var wyamDocsFolderDirectoryName = BuildParameters.WyamRootDirectoryPath.GetDirectoryName();
 
-        foreach(var file in filesChanged)
+        foreach (var file in filesChanged)
         {
             var forwardSlash = '/';
             Verbose("Changed File OldPath: {0}, Path: {1}", file.OldPath, file.Path);
-            if(file.OldPath.Contains(string.Format("{0}{1}", wyamDocsFolderDirectoryName, forwardSlash)) ||
+            if (file.OldPath.Contains(string.Format("{0}{1}", wyamDocsFolderDirectoryName, forwardSlash)) ||
                 file.Path.Contains(string.Format("{0}{1}", wyamDocsFolderDirectoryName, forwardSlash)) ||
                 file.Path.Contains("config.wyam"))
             {
@@ -43,7 +35,7 @@ BuildParameters.Tasks.PublishDocumentationTask = Task("Publish-Documentation")
             }
         }
 
-        if(docFileChanged)
+        if (docFileChanged)
         {
             Information("Detected that documentation files have changed, so running Wyam...");
 
@@ -82,9 +74,8 @@ BuildParameters.Tasks.PublishDocumentationTask = Task("Publish-Documentation")
 });
 
 BuildParameters.Tasks.PreviewDocumentationTask = Task("Preview-Documentation")
-    .IsDependentOn("Deploy-Graph-Documentation")
-    .WithCriteria(() => DirectoryExists(BuildParameters.WyamRootDirectoryPath))
-    .Does(() => RequireTool(WyamTool, () => {
+    .WithCriteria(() => DirectoryExists(BuildParameters.WyamRootDirectoryPath), "Wyam documentation directory is missing")
+    .Does(() => RequireTool(ToolSettings.WyamTool, () => {
         Wyam(new WyamSettings
         {
             Recipe = BuildParameters.WyamRecipe,
@@ -110,9 +101,8 @@ BuildParameters.Tasks.PreviewDocumentationTask = Task("Preview-Documentation")
 
 BuildParameters.Tasks.ForcePublishDocumentationTask = Task("Force-Publish-Documentation")
     .IsDependentOn("Clean-Documentation")
-    .IsDependentOn("Deploy-Graph-Documentation")
-    .WithCriteria(() => DirectoryExists(BuildParameters.WyamRootDirectoryPath))
-    .Does(() => RequireTool(WyamTool, () => {
+    .WithCriteria(() => DirectoryExists(BuildParameters.WyamRootDirectoryPath), "Wyam documentation directory is missing")
+    .Does(() => RequireTool(ToolSettings.WyamTool, () => {
         Wyam(new WyamSettings
         {
             Recipe = BuildParameters.WyamRecipe,
@@ -138,8 +128,8 @@ BuildParameters.Tasks.ForcePublishDocumentationTask = Task("Force-Publish-Docume
 
 public void PublishDocumentation()
 {
-    RequireTool(KuduSyncTool, () => {
-        if(BuildParameters.CanUseWyam)
+    RequireTool(ToolSettings.KuduSyncTool, () => {
+        if (BuildParameters.CanUseWyam)
         {
             var sourceCommit = GitLogTip("./");
 
@@ -158,14 +148,14 @@ public void PublishDocumentation()
                 Information("Stage all changes...");
                 GitAddAll(publishFolder);
 
-                if(GitHasStagedChanges(publishFolder))
+                if (GitHasStagedChanges(publishFolder))
                 {
                     Information("Commit all changes...");
                     GitCommit(
                         publishFolder,
                         sourceCommit.Committer.Name,
                         sourceCommit.Committer.Email,
-                        string.Format("AppVeyor Publish: {0}\r\n{1}", sourceCommit.Sha, sourceCommit.Message)
+                        string.Format("Continuous Integration Publish: {0}\r\n{1}", sourceCommit.Sha, sourceCommit.Message)
                     );
 
                     Information("Pushing all changes...");

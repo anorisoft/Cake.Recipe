@@ -1,10 +1,11 @@
-// -----------------------------------------------------------------------
-//  <copyright file="parameter.cake" company="Anori Soft">
-//      Copyright (c) Anori Soft Martin Egli. All rights reserved.
-//  </copyright>
-// -----------------------------------------------------------------------
-// Build Parameter file
-//
+public enum BranchType
+{
+    Unknown,
+    HotFix,
+    Release,
+    Develop,
+    Master
+}
 
 public static class BuildParameters
 {
@@ -15,7 +16,6 @@ public static class BuildParameters
 	private const bool DefaultShouldRunGitVersion = true;
 	private const bool DefaultShouldBuildNugetSourcePackage = true;
 	private const string DefaultCopyright = @"Copyright (c) Anori Soft 2016 - {0}";
-
     private static string _gitterMessage;
     private static string _microsoftTeamsMessage;
     private static string _twitterMessage;
@@ -24,94 +24,59 @@ public static class BuildParameters
     public static string Configuration { get; private set; }
     public static Cake.Core.Configuration.ICakeConfiguration CakeConfiguration { get; private set; }
     public static bool IsLocalBuild { get; private set; }
-    public static bool IsRunningOnUnix { get; private set; }
-    public static bool IsRunningOnWindows { get; private set; }
+    public static PlatformFamily BuildAgentOperatingSystem { get; private set; }
     public static bool IsRunningOnAppVeyor { get; private set; }
     public static bool IsPullRequest { get; private set; }
     public static bool IsMainRepository { get; private set; }
     public static bool IsPublicRepository {get; private set; }
-    public static bool IsMasterBranch { get; private set; }
-    public static bool IsDevelopBranch { get; private set; }
-    public static bool IsReleaseBranch { get; private set; }
-    public static bool IsHotFixBranch { get; private set ; }
     public static bool IsTagged { get; private set; }
     public static bool IsPublishBuild { get; private set; }
     public static bool IsReleaseBuild { get; private set; }
+    public static BranchType BranchType { get; private set; }
     public static bool IsDotNetCoreBuild { get; set; }
     public static bool IsNuGetBuild { get; set; }
     public static bool TransifexEnabled { get; set; }
     public static bool PrepareLocalRelease { get; set; }
     public static bool TreatWarningsAsErrors { get; set; }
+    public static bool ShouldPublishToMyGetWithApiKey { get; set; }
     public static string MasterBranchName { get; private set; }
     public static string DevelopBranchName { get; private set; }
+    public static string EmailRecipient { get; private set; }
+    public static string EmailSenderName { get; private set; }
+    public static string EmailSenderAddress { get; private set; }
+    public static bool ForceContinuousIntegration { get; private set; }
+
+    public static List<PackageSourceData> PackageSources { get; private set; }
+
+    public static string StandardMessage
+    {
+        get { return $"Version {Version.SemVersion} of the {Title} Addin has just been released, this will be available here https://www.nuget.org/packages/{Title}, once package indexing is complete."; }
+    }
 
     public static string GitterMessage
     {
-        get
-        {
-            if(_gitterMessage == null)
-            {
-                return "@/all Version " + Version.SemVersion + " of the " + Title + " Addin has just been released, https://www.nuget.org/packages/" + Title + ".";
-            }
-            else
-            {
-                return _gitterMessage;
-            }
-        }
-
-        set {
-            _gitterMessage = value;
-        }
+        get { return _gitterMessage ?? "@/all " + StandardMessage; }
+        set { _gitterMessage = value; }
     }
 
     public static string MicrosoftTeamsMessage
     {
-        get
-        {
-            if(_microsoftTeamsMessage == null)
-            {
-                return "Version " + Version.SemVersion + " of " + Title + " Addin has just been released, https://www.nuget.org/packages/" + Title + ".";
-            }
-            else
-            {
-                return _microsoftTeamsMessage;
-            }
-        }
-
-        set
-        {
-            _microsoftTeamsMessage = value;
-        }
+        get { return _microsoftTeamsMessage ?? StandardMessage; }
+        set { _microsoftTeamsMessage = value; }
     }
 
     public static string TwitterMessage
     {
-        get
-        {
-            if(_twitterMessage == null)
-            {
-                return "Version " + Version.SemVersion + " of " + Title + " Addin has just been released, https://www.nuget.org/packages/" + Title + ".";
-            }
-            else
-            {
-                return _twitterMessage;
-            }
-        }
-
-        set
-        {
-            _twitterMessage = value;
-        }
+        get { return _twitterMessage ?? StandardMessage; }
+        set { _twitterMessage = value; }
     }
 
     public static GitHubCredentials GitHub { get; private set; }
     public static MicrosoftTeamsCredentials MicrosoftTeams { get; private set; }
+    public static EmailCredentials Email { get; private set; }
     public static GitterCredentials Gitter { get; private set; }
     public static SlackCredentials Slack { get; private set; }
     public static TwitterCredentials Twitter { get; private set; }
-    public static MyGetCredentials MyGet { get; private set; }
-    public static NuGetCredentials NuGet { get; private set; }
-    public static ChocolateyCredentials Chocolatey { get; private set; }
     public static AppVeyorCredentials AppVeyor { get; private set; }
     public static CodecovCredentials Codecov { get; private set; }
     public static CoverallsCredentials Coveralls { get; private set; }
@@ -128,7 +93,6 @@ public static class BuildParameters
     public static DirectoryPath DocumentationDirectoryPath { get; private set; }
     public static FilePath IntegrationTestScriptPath { get; private set; }
     public static string TestFilePattern { get; private set; }
-    public static string TestWhere { get; private set; }
     public static string Title { get; private set; }
     public static string Copyright { get; private set; }
     public static string ResharperSettingsFileName { get; private set; }
@@ -145,9 +109,11 @@ public static class BuildParameters
     public static bool ShouldPostToSlack { get; private set; }
     public static bool ShouldPostToTwitter { get; private set; }
     public static bool ShouldPostToMicrosoftTeams { get; private set; }
+    public static bool ShouldSendEmail { get; private set; }
     public static bool ShouldDownloadMilestoneReleaseNotes { get; private set;}
     public static bool ShouldDownloadFullReleaseNotes { get; private set;}
     public static bool ShouldNotifyBetaReleases { get; private set; }
+    public static bool ShouldDeleteCachedFiles { get; private set; }
 
     public static FilePath MilestoneReleaseNotesFilePath { get; private set; }
     public static FilePath FullReleaseNotesFilePath { get; private set; }
@@ -156,14 +122,12 @@ public static class BuildParameters
     public static bool ShouldRunInspectCode { get; private set; }
     public static bool ShouldRunCodecov { get; private set; }
     public static bool ShouldRunDotNetCorePack { get; private set; }
+    public static bool ShouldRunChocolatey { get; private set; }
     public static bool ShouldPublishMyGet { get; private set; }
     public static bool ShouldPublishChocolatey { get; private set; }
     public static bool ShouldPublishNuGet { get; private set; }
-	public static bool ForcePublishNuGet { get; private set; }
     public static bool ShouldPublishGitHub { get; private set; }
-    public static bool ShouldDeployGraphDocumentation{get ;private set;}
     public static bool ShouldGenerateDocumentation { get; private set; }
-    public static bool ShouldExecuteGitLink { get; private set; }
     public static bool ShouldRunIntegrationTests { get; private set; }
     public static bool ShouldRunGitVersion { get; private set; }
 
@@ -178,10 +142,10 @@ public static class BuildParameters
     public static string WebBaseEditUrl { get; private set; }
 
     public static FilePath NuSpecFilePath { get; private set; }
-    public static ICollection<FilePath> NuSpecFilePaths { get; private set; }
 
     public static FilePath NugetConfig { get; private set; }
     public static ICollection<string> NuGetSources { get; private set; }
+    public static DirectoryPath RestorePackagesDirectory { get; private set; }
 
     public static IBuildProvider BuildProvider { get; private set; }
 
@@ -195,7 +159,15 @@ public static class BuildParameters
         get
         {
             return !string.IsNullOrEmpty(BuildParameters.GitHub.UserName) &&
-                !string.IsNullOrEmpty(BuildParameters.GitHub.Password);
+                (!string.IsNullOrEmpty(BuildParameters.GitHub.Password) || !string.IsNullOrEmpty(BuildParameters.GitHub.Token));
+        }
+    }
+
+    public static bool CanSendEmail
+    {
+        get
+        {
+            return !string.IsNullOrEmpty(BuildParameters.Email.SmtpHost);
         }
     }
 
@@ -243,33 +215,6 @@ public static class BuildParameters
             return !string.IsNullOrEmpty(BuildParameters.Wyam.AccessToken) &&
                 !string.IsNullOrEmpty(BuildParameters.Wyam.DeployRemote) &&
                 !string.IsNullOrEmpty(BuildParameters.Wyam.DeployBranch);
-        }
-    }
-
-    public static bool CanPublishToChocolatey
-    {
-        get
-        {
-            return !string.IsNullOrEmpty(BuildParameters.Chocolatey.ApiKey) &&
-                !string.IsNullOrEmpty(BuildParameters.Chocolatey.SourceUrl);
-        }
-    }
-
-    public static bool CanPublishToMyGet
-    {
-        get
-        {
-            return !string.IsNullOrEmpty(BuildParameters.MyGet.ApiKey) &&
-                !string.IsNullOrEmpty(BuildParameters.MyGet.SourceUrl);
-        }
-    }
-
-    public static bool CanPublishToNuGet
-    {
-        get
-        {
-            return !string.IsNullOrEmpty(BuildParameters.NuGet.ApiKey) &&
-                !string.IsNullOrEmpty(BuildParameters.NuGet.SourceUrl);
         }
     }
 
@@ -334,11 +279,10 @@ public static class BuildParameters
         context.Information("IsMainRepository: {0}", IsMainRepository);
         context.Information("IsPublicRepository: {0}", IsPublicRepository);
         context.Information("IsTagged: {0}", IsTagged);
-        context.Information("IsMasterBranch: {0}", IsMasterBranch);
-        context.Information("IsDevelopBranch: {0}", IsDevelopBranch);
-        context.Information("IsReleaseBranch: {0}", IsReleaseBranch);
-        context.Information("IsHotFixBranch: {0}", IsHotFixBranch);
+        context.Information("BranchType: {0}", BranchType);
         context.Information("TreatWarningsAsErrors: {0}", TreatWarningsAsErrors);
+        context.Information("ShouldPublishToMyGetWithApiKey: {0}", ShouldPublishToMyGetWithApiKey);
+        context.Information("ShouldSendEmail: {0}", ShouldSendEmail);
         context.Information("ShouldPostToGitter: {0}", ShouldPostToGitter);
         context.Information("ShouldPostToSlack: {0}", ShouldPostToSlack);
         context.Information("ShouldPostToTwitter: {0}", ShouldPostToTwitter);
@@ -346,13 +290,11 @@ public static class BuildParameters
         context.Information("ShouldDownloadFullReleaseNotes: {0}", ShouldDownloadFullReleaseNotes);
         context.Information("ShouldDownloadMilestoneReleaseNotes: {0}", ShouldDownloadMilestoneReleaseNotes);
         context.Information("ShouldNotifyBetaReleases: {0}", ShouldNotifyBetaReleases);
-        context.Information("ShouldDeployGraphDocumentation: {0}", ShouldDeployGraphDocumentation);
+        context.Information("ShouldDeleteCachedFiles: {0}", ShouldDeleteCachedFiles);
         context.Information("ShouldGenerateDocumentation: {0}", ShouldGenerateDocumentation);
-        context.Information("ShouldExecuteGitLink: {0}", ShouldExecuteGitLink);
         context.Information("ShouldRunIntegrationTests: {0}", ShouldRunIntegrationTests);
         context.Information("ShouldRunGitVersion: {0}", ShouldRunGitVersion);
-        context.Information("IsRunningOnUnix: {0}", IsRunningOnUnix);
-        context.Information("IsRunningOnWindows: {0}", IsRunningOnWindows);
+        context.Information("BuildAgentOperatingSystem: {0}", BuildAgentOperatingSystem);
         context.Information("IsRunningOnAppVeyor: {0}", IsRunningOnAppVeyor);
         context.Information("RepositoryOwner: {0}", RepositoryOwner);
         context.Information("RepositoryName: {0}", RepositoryName);
@@ -360,6 +302,8 @@ public static class BuildParameters
         context.Information("CanPullTranslations: {0}", CanPullTranslations);
         context.Information("CanPushTranslations: {0}", CanPushTranslations);
         context.Information("PrepareLocalRelease: {0}", PrepareLocalRelease);
+        context.Information("BuildAgentOperatingSystem: {0}", BuildAgentOperatingSystem);
+        context.Information("ForceContinuousIntegration: {0}", ForceContinuousIntegration);
 
         if (TransifexEnabled)
         {
@@ -379,12 +323,12 @@ public static class BuildParameters
         context.Information("WebLinkRoot: {0}", WebLinkRoot);
         context.Information("WebBaseEditUrl: {0}", WebBaseEditUrl);
         context.Information("NuSpecFilePath: {0}", NuSpecFilePath);
-		if(NuSpecFilePaths != null && NuSpecFilePaths.Any())
-		{
-			context.Information("NuSpecFilePaths: {0}", string.Join(", ", NuSpecFilePaths));
-		}
-		context.Information("NugetConfig: {0} ({1})", NugetConfig, context.FileExists(NugetConfig));
+        context.Information("NugetConfig: {0} ({1})", NugetConfig, context.FileExists(NugetConfig));
         context.Information("NuGetSources: {0}", string.Join(", ", NuGetSources));
+        context.Information("RestorePackagesDirectory: {0}", RestorePackagesDirectory);
+        context.Information("EmailRecipient: {0}", EmailRecipient);
+        context.Information("EmailSenderName: {0}", EmailSenderName);
+        context.Information("EmailSenderAddress: {0}", EmailSenderAddress);
     }
 
     public static void SetParameters(
@@ -399,7 +343,6 @@ public static class BuildParameters
         DirectoryPath testDirectoryPath = null,
         DirectoryPath documentationDirectoryPath = null,
         string testFilePattern = null,
-        string testWhere = null,
         string integrationTestScriptPath = null,
         string resharperSettingsFileName = null,
         string repositoryOwner = null,
@@ -410,26 +353,26 @@ public static class BuildParameters
         bool shouldPostToSlack = true,
         bool shouldPostToTwitter = true,
         bool shouldPostToMicrosoftTeams = false,
+        bool shouldSendEmail = true,
         bool shouldDownloadMilestoneReleaseNotes = false,
         bool shouldDownloadFullReleaseNotes = false,
         bool shouldNotifyBetaReleases = false,
+        bool shouldDeleteCachedFiles = false,
         FilePath milestoneReleaseNotesFilePath = null,
         FilePath fullReleaseNotesFilePath = null,
         bool shouldPublishMyGet = true,
+        bool shouldRunChocolatey = true,
         bool shouldPublishChocolatey = true,
         bool shouldPublishNuGet = true,
-		bool forcePublishNuGet = false,
         bool shouldPublishGitHub = true,
-        bool shouldDeployGraphDocumentation = true,
         bool shouldGenerateDocumentation = true,
-        bool shouldExecuteGitLink = true,
         bool shouldRunDupFinder = true,
         bool shouldRunInspectCode = true,
         bool shouldRunCodecov = false,
         bool shouldRunDotNetCorePack = false,
-        bool shouldBuildNugetSourcePackage = DefaultShouldBuildNugetSourcePackage,
+        bool shouldBuildNugetSourcePackage = false,
         bool shouldRunIntegrationTests = false,
-        bool? shouldRunGitVersion = DefaultShouldRunGitVersion,
+        bool? shouldRunGitVersion = null,
         bool? transifexEnabled = null,
         TransifexMode transifexPullMode = TransifexMode.OnlyTranslated,
         int transifexPullPercentage = 60,
@@ -446,13 +389,18 @@ public static class BuildParameters
         string webLinkRoot = null,
         string webBaseEditUrl = null,
         FilePath nuspecFilePath = null,
-		ICollection<FilePath> nuspecFilePaths = null,
         bool isPublicRepository = true,
         FilePath nugetConfig = null,
         ICollection<string> nuGetSources = null,
         bool treatWarningsAsErrors = true,
         string masterBranchName = "master",
-        string developBranchName = "develop"
+        string developBranchName = "develop",
+        string emailRecipient = null,
+        string emailSenderName = null,
+        string emailSenderAddress = null,
+        bool shouldPublishToMyGetWithApiKey = true,
+        DirectoryPath restorePackagesDirectory = null,
+        List<PackageSourceData> packageSourceDatas = null
         )
     {
         if (context == null)
@@ -462,6 +410,11 @@ public static class BuildParameters
 
         BuildProvider = GetBuildProvider(context, buildSystem);
 
+        EmailRecipient = emailRecipient;
+        EmailSenderName = emailSenderName;
+        EmailSenderAddress = emailSenderAddress;
+
+        SourceDirectoryPath = sourceDirectoryPath;
         Title = title;
 		Copyright = string.Format(copyright, DateTime.Now.Year);
         SourceDirectoryPath = sourceDirectoryPath ?? new DirectoryPath(DefaultSourceDirectoryPath);
@@ -471,7 +424,6 @@ public static class BuildParameters
         TestDirectoryPath = testDirectoryPath ?? new DirectoryPath(DefaultTestDirectoryPath) ?? sourceDirectoryPath;
         DocumentationDirectoryPath = documentationDirectoryPath ?? new DirectoryPath(DefaultDocumentationDirectoryPath) ?? sourceDirectoryPath;
         TestFilePattern = testFilePattern;
-        TestWhere = testWhere;
         IntegrationTestScriptPath = integrationTestScriptPath ?? context.MakeAbsolute((FilePath)"test.cake");
         ResharperSettingsFileName = resharperSettingsFileName ?? string.Format("{0}.sln.DotSettings", Title);
         RepositoryOwner = repositoryOwner ?? string.Empty;
@@ -488,7 +440,7 @@ public static class BuildParameters
         TwitterMessage = twitterMessage;
 
         WyamRootDirectoryPath = wyamRootDirectoryPath ?? context.MakeAbsolute(context.Directory("docs"));
-        WyamPublishDirectoryPath = wyamPublishDirectoryPath ?? context.MakeAbsolute(context.Directory("BuildABuildArtifacts/temp/_PublishedDocumentation"));
+        WyamPublishDirectoryPath = wyamPublishDirectoryPath ?? context.MakeAbsolute(context.Directory("BuildArtifacts/temp/_PublishedDocumentation"));
         WyamConfigurationFile = wyamConfigurationFile ?? context.MakeAbsolute((FilePath)"config.wyam");
         WyamRecipe = wyamRecipe ?? "Docs";
         WyamTheme = wyamTheme ?? "Samson";
@@ -501,22 +453,22 @@ public static class BuildParameters
         ShouldPostToSlack = shouldPostToSlack;
         ShouldPostToTwitter = shouldPostToTwitter;
         ShouldPostToMicrosoftTeams = shouldPostToMicrosoftTeams;
+        ShouldSendEmail = shouldSendEmail;
         ShouldDownloadFullReleaseNotes = shouldDownloadFullReleaseNotes;
         ShouldDownloadMilestoneReleaseNotes = shouldDownloadMilestoneReleaseNotes;
         ShouldNotifyBetaReleases = shouldNotifyBetaReleases;
+        ShouldDeleteCachedFiles = shouldDeleteCachedFiles;
         ShouldRunDupFinder = shouldRunDupFinder;
         ShouldRunInspectCode = shouldRunInspectCode;
         ShouldRunCodecov = shouldRunCodecov;
         ShouldRunDotNetCorePack = shouldRunDotNetCorePack;
         ShouldBuildNugetSourcePackage = shouldBuildNugetSourcePackage;
-        ShouldRunGitVersion = shouldRunGitVersion ?? context.IsRunningOnWindows();
+        ShouldRunGitVersion = shouldRunGitVersion ?? BuildParameters.BuildAgentOperatingSystem == PlatformFamily.Windows;
 
         MilestoneReleaseNotesFilePath = milestoneReleaseNotesFilePath ?? RootDirectoryPath.CombineWithFilePath("CHANGELOG.md");
         FullReleaseNotesFilePath = fullReleaseNotesFilePath ?? RootDirectoryPath.CombineWithFilePath("ReleaseNotes.md");
 
-		NuSpecFilePath = nuspecFilePath ?? context.MakeAbsolute(SourceDirectoryPath.CombineWithFilePath(Title + @"/" + Title + ".csproj"));
-//		NuSpecFilePath = nuspecFilePath ?? context.MakeAbsolute((FilePath)"./Cake.Recipe/Cake.Recipe.nuspec");
-		NuSpecFilePaths = nuspecFilePaths;
+        NuSpecFilePath = nuspecFilePath ?? context.MakeAbsolute((FilePath)"./Cake.Recipe/Cake.Recipe.nuspec");
 
         NugetConfig = context.MakeAbsolute(nugetConfig ?? (FilePath)"./NuGet.Config");
         NuGetSources = nuGetSources;
@@ -543,36 +495,59 @@ public static class BuildParameters
             }
         }
 
+        RestorePackagesDirectory = restorePackagesDirectory;
+
         Target = context.Argument("target", "Default");
         Configuration = context.Argument("configuration", "Release");
         PrepareLocalRelease = context.Argument("prepareLocalRelease", false);
+        ForceContinuousIntegration = context.Argument("forceContinuousIntegration", false);
+
         CakeConfiguration = context.GetConfiguration();
         MasterBranchName = masterBranchName;
         DevelopBranchName = developBranchName;
         IsLocalBuild = buildSystem.IsLocalBuild;
-        IsRunningOnUnix = context.IsRunningOnUnix();
-        IsRunningOnWindows = context.IsRunningOnWindows();
         IsRunningOnAppVeyor = buildSystem.AppVeyor.IsRunningOnAppVeyor;
         IsPullRequest = BuildProvider.PullRequest.IsPullRequest;
         IsMainRepository = StringComparer.OrdinalIgnoreCase.Equals(string.Concat(repositoryOwner, "/", repositoryName), BuildProvider.Repository.Name);
         IsPublicRepository = isPublicRepository;
-        IsMasterBranch = StringComparer.OrdinalIgnoreCase.Equals(masterBranchName, BuildProvider.Repository.Branch);
-        IsDevelopBranch = StringComparer.OrdinalIgnoreCase.Equals(developBranchName, BuildProvider.Repository.Branch);
-        IsReleaseBranch = BuildProvider.Repository.Branch.StartsWith("release", StringComparison.OrdinalIgnoreCase);
-        IsHotFixBranch = BuildProvider.Repository.Branch.StartsWith("hotfix", StringComparison.OrdinalIgnoreCase);
+
+        var branchName = BuildProvider.Repository.Branch;
+        if (StringComparer.OrdinalIgnoreCase.Equals(masterBranchName, branchName))
+        {
+            BranchType = BranchType.Master;
+        }
+        else if (StringComparer.OrdinalIgnoreCase.Equals(developBranchName, branchName))
+        {
+            BranchType = BranchType.Develop;
+        }
+        else if (branchName.StartsWith("release", StringComparison.OrdinalIgnoreCase))
+        {
+            BranchType = BranchType.Release;
+        }
+        else if (branchName.StartsWith("hotfix", StringComparison.OrdinalIgnoreCase))
+        {
+            BranchType = BranchType.HotFix;
+        }
+        else
+        {
+            BranchType = BranchType.Unknown;
+        }
+
         IsTagged = (
             BuildProvider.Repository.Tag.IsTag &&
             !string.IsNullOrWhiteSpace(BuildProvider.Repository.Tag.Name)
         );
         TreatWarningsAsErrors = treatWarningsAsErrors;
+
+        BuildAgentOperatingSystem = context.Environment.Platform.Family;
+
+        ShouldPublishToMyGetWithApiKey = shouldPublishToMyGetWithApiKey;
         GitHub = GetGitHubCredentials(context);
         MicrosoftTeams = GetMicrosoftTeamsCredentials(context);
+        Email = GetEmailCredentials(context);
         Gitter = GetGitterCredentials(context);
         Slack = GetSlackCredentials(context);
         Twitter = GetTwitterCredentials(context);
-        MyGet = GetMyGetCredentials(context);
-        NuGet = GetNuGetCredentials(context);
-        Chocolatey = GetChocolateyCredentials(context);
         AppVeyor = GetAppVeyorCredentials(context);
         Codecov = GetCodecovCredentials(context);
         Coveralls = GetCoverallsCredentials(context);
@@ -584,8 +559,8 @@ public static class BuildParameters
             releaseTarget => StringComparer.OrdinalIgnoreCase.Equals(releaseTarget, Target)
         );
         IsReleaseBuild = new [] {
-            "Publish-NuGet-Packages",
-            "Publish-Chocolatey-Packages",
+            "Publish-PreRelease-Packages",
+            "Publish-Release-Packages",
             "Publish-GitHub-Release"
         }.Any(
             publishTarget => StringComparer.OrdinalIgnoreCase.Equals(publishTarget, Target)
@@ -596,52 +571,70 @@ public static class BuildParameters
         ShouldPublishMyGet = (!IsLocalBuild &&
                                 !IsPullRequest &&
                                 IsMainRepository &&
-                                (IsTagged || !IsMasterBranch) &&
+                                (IsTagged || BuildParameters.BranchType != BranchType.Master) &&
                                 shouldPublishMyGet);
 
-        ShouldPublishNuGet = forcePublishNuGet || (!IsLocalBuild &&
+        ShouldPublishNuGet = (!IsLocalBuild &&
                                 !IsPullRequest &&
                                 IsMainRepository &&
-                                (IsMasterBranch || IsReleaseBranch || IsHotFixBranch) &&
+                                (BuildParameters.BranchType == BranchType.Master || BuildParameters.BranchType == BranchType.Release || BuildParameters.BranchType == BranchType.HotFix) &&
                                 IsTagged &&
                                 shouldPublishNuGet);
 
-		ForcePublishNuGet = forcePublishNuGet;
-if (forcePublishNuGet){
-	context.Information("Force Publish NuGet!");
-}
+        ShouldRunChocolatey = shouldRunChocolatey;
 
         ShouldPublishChocolatey = (!IsLocalBuild &&
                                     !IsPullRequest &&
                                     IsMainRepository &&
-                                    (IsMasterBranch || IsReleaseBranch || IsHotFixBranch) &&
+                                    (BuildParameters.BranchType == BranchType.Master || BuildParameters.BranchType == BranchType.Release || BuildParameters.BranchType == BranchType.HotFix) &&
                                     IsTagged &&
                                     shouldPublishChocolatey);
 
         ShouldPublishGitHub = (!IsLocalBuild &&
                                 !IsPullRequest &&
                                 IsMainRepository &&
-                                (IsMasterBranch || IsReleaseBranch || IsHotFixBranch) &&
+                                (BuildParameters.BranchType == BranchType.Master || BuildParameters.BranchType == BranchType.Release || BuildParameters.BranchType == BranchType.HotFix) &&
                                 IsTagged &&
                                 shouldPublishGitHub);
 
         ShouldGenerateDocumentation = (!IsLocalBuild &&
                                 !IsPullRequest &&
                                 IsMainRepository &&
-                                (IsMasterBranch || IsDevelopBranch) &&
+                                (BuildParameters.BranchType == BranchType.Master || BuildParameters.BranchType == BranchType.Develop) &&
                                 shouldGenerateDocumentation);
 
-        ShouldDeployGraphDocumentation = shouldDeployGraphDocumentation;
-
-        ShouldExecuteGitLink = (!IsLocalBuild &&
-                            !IsPullRequest &&
-                            IsMainRepository &&
-                            (IsMasterBranch || IsDevelopBranch || IsReleaseBranch || IsHotFixBranch) &&
-                            shouldExecuteGitLink);
-
         ShouldRunIntegrationTests = (((!IsLocalBuild && !IsPullRequest && IsMainRepository) &&
-                                        (IsMasterBranch || IsDevelopBranch || IsReleaseBranch || IsHotFixBranch) &&
+                                        (BuildParameters.BranchType == BranchType.Master || BuildParameters.BranchType == BranchType.Develop || BuildParameters.BranchType == BranchType.Release || BuildParameters.BranchType == BranchType.HotFix) &&
                                         context.FileExists(context.MakeAbsolute(BuildParameters.IntegrationTestScriptPath))) ||
                                         shouldRunIntegrationTests);
+
+        if (packageSourceDatas?.Any() ?? false)
+        {
+            PackageSources = packageSourceDatas;
+        }
+        else
+        {
+            PackageSources = new List<PackageSourceData>();
+
+            // Try to get the deprecated way of doing things, set them as default sources
+            var myGetUrl = context.EnvironmentVariable(Environment.MyGetSourceUrlVariable);
+            if (!string.IsNullOrEmpty(myGetUrl))
+            {
+                PackageSources.Add(new PackageSourceData(context, "MYGET", myGetUrl, FeedType.NuGet, false));
+                PackageSources.Add(new PackageSourceData(context, "MYGET", myGetUrl, FeedType.Chocolatey, false));
+            }
+
+            var nuGetUrl = context.EnvironmentVariable(Environment.NuGetSourceUrlVariable);
+            if (!string.IsNullOrEmpty(nuGetUrl))
+            {
+                PackageSources.Add(new PackageSourceData(context, "NUGET", nuGetUrl));
+            }
+
+            var chocolateyUrl = context.EnvironmentVariable(Environment.ChocolateySourceUrlVariable);
+            if (!string.IsNullOrEmpty(chocolateyUrl))
+            {
+                PackageSources.Add(new PackageSourceData(context, "CHOCOLATEY", chocolateyUrl, FeedType.Chocolatey));
+            }
+        }
     }
 }

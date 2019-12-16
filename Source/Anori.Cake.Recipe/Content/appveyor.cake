@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 BuildParameters.Tasks.PrintAppVeyorEnvironmentVariablesTask = Task("Print-AppVeyor-Environment-Variables")
-    .WithCriteria(() => AppVeyor.IsRunningOnAppVeyor)
+    .WithCriteria(() => AppVeyor.IsRunningOnAppVeyor, "Skipping because not running an AppVeyor")
     .Does(() =>
 {
     Information("CI: {0}", EnvironmentVariable("CI"));
@@ -34,24 +34,9 @@ BuildParameters.Tasks.PrintAppVeyorEnvironmentVariablesTask = Task("Print-AppVey
     Information("CONFIGURATION: {0}", EnvironmentVariable("CONFIGURATION"));
 });
 
-BuildParameters.Tasks.UploadAppVeyorArtifactsTask = Task("Upload-AppVeyor-Artifacts")
-    .IsDependentOn("Package")
-    .WithCriteria(() => BuildParameters.IsRunningOnAppVeyor)
-    .WithCriteria(() => DirectoryExists(BuildParameters.Paths.Directories.NuGetPackages) || DirectoryExists(BuildParameters.Paths.Directories.ChocolateyPackages))
-    .Does(() =>
-{
-    // Concatenating FilePathCollections should make sure we get unique FilePaths
-    foreach(var package in GetFiles(BuildParameters.Paths.Directories.Packages + "/**/*") +
-                           GetFiles(BuildParameters.Paths.Directories.NuGetPackages + "/*") +
-                           GetFiles(BuildParameters.Paths.Directories.ChocolateyPackages + "/*"))
-    {
-        AppVeyor.UploadArtifact(package);
-    }
-});
-
 BuildParameters.Tasks.ClearAppVeyorCacheTask = Task("Clear-AppVeyor-Cache")
     .Does(() =>
-        RequireAddin(@"#addin nuget:?package=Cake.AppVeyor&version=3.0.0&loaddependencies=true
+        RequireAddin(@"#addin nuget:?package=Cake.AppVeyor&version=4.0.0&loaddependencies=true
         AppVeyorClearCache(new AppVeyorSettings() { ApiToken = EnvironmentVariable(""TEMP_APPVEYOR_TOKEN"") },
             EnvironmentVariable(""TEMP_APPVEYOR_ACCOUNT_NAME""),
             EnvironmentVariable(""TEMP_APPVEYOR_PROJECT_SLUG""));
@@ -75,7 +60,7 @@ public class AppVeyorTagInfo : ITagInfo
 
     public bool IsTag { get; }
 
-    public string Name { get; }    
+    public string Name { get; }
 }
 
 public class AppVeyorRepositoryInfo : IRepositoryInfo
@@ -91,7 +76,7 @@ public class AppVeyorRepositoryInfo : IRepositoryInfo
 
     public string Name { get; }
 
-    public ITagInfo Tag { get; }    
+    public ITagInfo Tag { get; }
 }
 
 public class AppVeyorPullRequestInfo : IPullRequestInfo
@@ -101,17 +86,17 @@ public class AppVeyorPullRequestInfo : IPullRequestInfo
         IsPullRequest = appVeyor.Environment.PullRequest.IsPullRequest;
     }
 
-    public bool IsPullRequest { get; }    
+    public bool IsPullRequest { get; }
 }
 
 public class AppVeyorBuildInfo : IBuildInfo
 {
     public AppVeyorBuildInfo(IAppVeyorProvider appVeyor)
     {
-        Number = appVeyor.Environment.Build.Number;
+        Number = appVeyor.Environment.Build.Number.ToString();
     }
 
-    public int Number { get; }    
+    public string Number { get; }
 }
 
 public class AppVeyorBuildProvider : IBuildProvider
@@ -121,6 +106,8 @@ public class AppVeyorBuildProvider : IBuildProvider
         Repository = new AppVeyorRepositoryInfo(appVeyor);
         PullRequest = new AppVeyorPullRequestInfo(appVeyor);
         Build = new AppVeyorBuildInfo(appVeyor);
+
+        _appVeyor = appVeyor;
     }
 
     public IRepositoryInfo Repository { get; }
@@ -128,4 +115,11 @@ public class AppVeyorBuildProvider : IBuildProvider
     public IPullRequestInfo PullRequest { get; }
 
     public IBuildInfo Build { get; }
+
+    private readonly IAppVeyorProvider _appVeyor;
+
+    public void UploadArtifact(FilePath file)
+    {
+        _appVeyor.UploadArtifact(file);    
+    }
 }

@@ -21,7 +21,7 @@ public interface IPullRequestInfo
 
 public interface IBuildInfo
 {
-    int Number { get; }
+    string Number { get; }
 }
 
 public interface IBuildProvider
@@ -31,10 +31,31 @@ public interface IBuildProvider
     IPullRequestInfo PullRequest { get; }
 
     IBuildInfo Build { get; }
+
+    void UploadArtifact(FilePath file);
 }
 
 public static IBuildProvider GetBuildProvider(ICakeContext context, BuildSystem buildSystem)
 {
-    // always fallback to AppVeyor
-    return new AppVeyorBuildProvider(buildSystem.AppVeyor);
+    if (buildSystem.IsRunningOnAzurePipelines || buildSystem.IsRunningOnAzurePipelinesHosted)
+    {
+        context.Information("Using Azure DevOps Pipelines Provider...");
+        return new AzurePipelinesBuildProvider(buildSystem.TFBuild, context.Environment);
+    }
+
+    if (buildSystem.IsRunningOnTeamCity)
+    {
+        context.Information("Using TeamCity Provider...");
+        return new TeamCityBuildProvider(buildSystem.TeamCity, context);
+    }
+
+    if (buildSystem.IsRunningOnAppVeyor)
+    {
+        context.Information("Using AppVeyor Provider...");
+        return new AppVeyorBuildProvider(buildSystem.AppVeyor);
+    }
+
+    // always fallback to Local Build
+    context.Information("Using Local Build Provider...");
+    return new LocalBuildBuildProvider(context);
 }

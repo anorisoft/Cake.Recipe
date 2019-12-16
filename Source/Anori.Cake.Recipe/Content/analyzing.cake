@@ -7,7 +7,7 @@ public void LaunchDefaultProgram(FilePath file) {
     FilePath program;
     string arguments = "";
 
-    if (BuildParameters.IsRunningOnWindows)
+    if (BuildParameters.BuildAgentOperatingSystem == PlatformFamily.Windows)
     {
         program = "cmd";
         arguments = "/c start ";
@@ -25,9 +25,9 @@ public void LaunchDefaultProgram(FilePath file) {
 }
 
 BuildParameters.Tasks.DupFinderTask = Task("DupFinder")
-    .WithCriteria(() => BuildParameters.IsRunningOnWindows)
-    .WithCriteria(() => BuildParameters.ShouldRunDupFinder)
-    .Does(() => RequireTool(ReSharperTools, () => {
+    .WithCriteria(() => BuildParameters.BuildAgentOperatingSystem == PlatformFamily.Windows, "Skipping due to not running on Windows")
+    .WithCriteria(() => BuildParameters.ShouldRunDupFinder, "Skipping because DupFinder has been disabled")
+    .Does(() => RequireTool(ToolSettings.ReSharperTools, () => {
         var settings = new DupFinderSettings() {
             ShowStats = true,
             ShowText = true,
@@ -36,17 +36,17 @@ BuildParameters.Tasks.DupFinderTask = Task("DupFinder")
             ThrowExceptionOnFindingDuplicates = ToolSettings.DupFinderThrowExceptionOnFindingDuplicates ?? true
         };
 
-        if(ToolSettings.DupFinderExcludePattern != null)
+        if (ToolSettings.DupFinderExcludePattern != null)
         {
             settings.ExcludePattern = ToolSettings.DupFinderExcludePattern;
         }
 
-        if(ToolSettings.DupFinderExcludeFilesByStartingCommentSubstring != null)
+        if (ToolSettings.DupFinderExcludeFilesByStartingCommentSubstring != null)
         {
             settings.ExcludeFilesByStartingCommentSubstring = ToolSettings.DupFinderExcludeFilesByStartingCommentSubstring;
         }
 
-        if(ToolSettings.DupFinderDiscardCost != null)
+        if (ToolSettings.DupFinderDiscardCost != null)
         {
             settings.DiscardCost = ToolSettings.DupFinderDiscardCost.Value;
         }
@@ -56,7 +56,7 @@ BuildParameters.Tasks.DupFinderTask = Task("DupFinder")
 )
 .ReportError(exception =>
 {
-    RequireTool(ReSharperReportsTool, () => {
+    RequireTool(ToolSettings.ReSharperReportsTool, () => {
         var outputHtmlFile = BuildParameters.Paths.Directories.DupFinderTestResults.CombineWithFilePath("dupfinder.html");
 
         Information("Duplicates were found in your codebase, creating HTML report...");
@@ -64,12 +64,12 @@ BuildParameters.Tasks.DupFinderTask = Task("DupFinder")
             BuildParameters.Paths.Directories.DupFinderTestResults.CombineWithFilePath("dupfinder.xml"),
             outputHtmlFile);
 
-        if(BuildParameters.IsRunningOnAppVeyor && FileExists(outputHtmlFile))
+        if (!BuildParameters.IsLocalBuild && FileExists(outputHtmlFile))
         {
-            AppVeyor.UploadArtifact(outputHtmlFile);
+            BuildParameters.BuildProvider.UploadArtifact(outputHtmlFile);
         }
 
-        if(BuildParameters.IsLocalBuild)
+        if (BuildParameters.IsLocalBuild)
         {
             LaunchDefaultProgram(outputHtmlFile);
         }
@@ -77,9 +77,9 @@ BuildParameters.Tasks.DupFinderTask = Task("DupFinder")
 });
 
 BuildParameters.Tasks.InspectCodeTask = Task("InspectCode")
-    .WithCriteria(() => BuildParameters.IsRunningOnWindows)
-    .WithCriteria(() => BuildParameters.ShouldRunInspectCode)
-    .Does<BuildData>(data => RequireTool(ReSharperTools, () => {
+    .WithCriteria(() => BuildParameters.BuildAgentOperatingSystem == PlatformFamily.Windows, "Skipping due to not running on Windows")
+    .WithCriteria(() => BuildParameters.ShouldRunInspectCode, "Skipping because InspectCode has been disabled")
+    .Does<BuildData>(data => RequireTool(ToolSettings.ReSharperTools, () => {
         var inspectCodeLogFilePath = BuildParameters.Paths.Directories.InspectCodeTestResults.CombineWithFilePath("inspectcode.xml");
 
         var settings = new InspectCodeSettings() {
@@ -87,40 +87,18 @@ BuildParameters.Tasks.InspectCodeTask = Task("InspectCode")
             OutputFile = inspectCodeLogFilePath
         };
 
-        if(FileExists(BuildParameters.SourceDirectoryPath.CombineWithFilePath(BuildParameters.ResharperSettingsFileName)))
+        if (FileExists(BuildParameters.SourceDirectoryPath.CombineWithFilePath(BuildParameters.ResharperSettingsFileName)))
         {
             settings.Profile = BuildParameters.SourceDirectoryPath.CombineWithFilePath(BuildParameters.ResharperSettingsFileName);
         }
 
         InspectCode(BuildParameters.SolutionFilePath, settings);
 
-        // Parse issues.
-        var issues =
-            ReadIssues(
-                InspectCodeIssuesFromFilePath(inspectCodeLogFilePath),
-                data.RepositoryRoot);
-        Information("{0} InspectCode issues are found.", issues.Count());
-        data.AddIssues(issues);
+        // Pass path to InspectCode log file to Cake.Issues.Recipe
+        IssuesParameters.InputFiles.InspectCodeLogFilePath = inspectCodeLogFilePath;
     })
 );
 
-BuildParameters.Tasks.InspectCodeTask = Task("CreateIssuesReport")
-    .Does<BuildData>(data => {
-        var issueReportFile = BuildParameters.Paths.Directories.TestResults.CombineWithFilePath("issues-report.html");
-
-        CreateIssueReport(
-            data.Issues,
-            GenericIssueReportFormatFromEmbeddedTemplate(GenericIssueReportTemplate.HtmlDxDataGrid),
-            "./",
-            issueReportFile);
-
-        if(BuildParameters.IsRunningOnAppVeyor && FileExists(issueReportFile))
-        {
-            AppVeyor.UploadArtifact(issueReportFile);
-        }
-    });
-
 BuildParameters.Tasks.AnalyzeTask = Task("Analyze")
     .IsDependentOn("DupFinder")
-    .IsDependentOn("InspectCode")
-    .IsDependentOn("CreateIssuesReport");
+    .IsDependentOn("InspectCode");

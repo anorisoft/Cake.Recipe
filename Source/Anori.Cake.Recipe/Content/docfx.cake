@@ -50,7 +50,7 @@ Task("CodeDocumentation")
 	.Does(() => 
 	{
 		SetupDocFxEnvironment();
-		RequireTool(DocFxTool, () => 
+		RequireTool(ToolSettings.DocFxTool, () => 
 		{
 			var documentationDirectoryPath = MakeAbsolute(BuildParameters.DocumentationDirectoryPath);
 			Debug("Documentation DirectoryPath: {0}", documentationDirectoryPath);
