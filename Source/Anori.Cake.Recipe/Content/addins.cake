@@ -37,7 +37,7 @@
 #addin nuget:?package=Cake.Issues.Markdownlint&version=0.6.1&loaddependencies=true
 
 // Sonar
-#addin nuget:?package=Cake.Sonar=1.1.22
+#addin nuget:?package=Cake.Sonar&version=1.1.22
 
 
 Action<string, IDictionary<string, string>> RequireAddin = (code, envVars) => {
