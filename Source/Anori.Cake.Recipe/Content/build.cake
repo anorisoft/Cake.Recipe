@@ -3,6 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 var publishingError = false;
+var currentSupportedCakeVersionNumber = "0.32.1.0";
 
 ///////////////////////////////////////////////////////////////////////////////
 // SETUP / TEARDOWN
@@ -12,7 +13,7 @@ Setup<BuildData>(context =>
 {
     Information(Figlet(BuildParameters.Title));
 
-    Information("Starting Setup...!");
+    Information("Starting Setup...");
 
     if(BuildParameters.IsMasterBranch && (context.Log.Verbosity != Verbosity.Diagnostic)) {
         Information("Increasing verbosity to diagnostic.");
@@ -57,13 +58,18 @@ Setup<BuildData>(context =>
 	}
 	
 
-    Information("Building version {0} of " + BuildParameters.Title + " ({1}, {2}) using version {3} of Cake, and version {4} of Anori.Cake.Recipe. (IsTagged: {5})",
+    Information("Building version {0} of " + BuildParameters.Title + " ({1}, {2}) using version {3} of Cake, and version {4} of Cake.Recipe. (IsTagged: {5})",
         BuildParameters.Version.SemVersion,
         BuildParameters.Configuration,
         BuildParameters.Target,
         BuildParameters.Version.CakeVersion,
         BuildMetaData.Version,
         BuildParameters.IsTagged);
+
+    if(BuildParameters.Version.CakeVersion != currentSupportedCakeVersionNumber)
+    {
+        throw new Exception(string.Format("Cake.Recipe currently only supports building projects using version {0} of Cake.  Please update your packages.config file (or whatever method is used to pin to a specific version of Cake) to use this version.", currentSupportedCakeVersionNumber));
+    }
 
     return new BuildData(context);
 });
@@ -117,7 +123,6 @@ Teardown(context =>
 ///////////////////////////////////////////////////////////////////////////////
 // TASK DEFINITIONS
 ///////////////////////////////////////////////////////////////////////////////
-
 
 BuildParameters.Tasks.ShowInfoTask = Task("Show-Info")
     .Does(() =>
@@ -587,23 +592,16 @@ public class Builder
     {
         BuildParameters.IsDotNetCoreBuild = false;
         BuildParameters.IsNuGetBuild = false;
-
         SetupTasks(BuildParameters.IsDotNetCoreBuild);
-
         _action(BuildParameters.Target);
     }
-
-	
-
 
     public void RunDotNetCore()
     {
         BuildParameters.IsDotNetCoreBuild = true;
         BuildParameters.IsNuGetBuild = false;
-
-        SetupTasks(BuildParameters.IsDotNetCoreBuild);
-
-        _action(BuildParameters.Target);
+		SetupTasks(BuildParameters.IsDotNetCoreBuild);
+		_action(BuildParameters.Target);
     }
 
     public void RunNuGet()
@@ -612,12 +610,17 @@ public class Builder
         BuildParameters.IsNuGetBuild = true;
 		SetupTasks(BuildParameters.IsDotNetCoreBuild);
 		BuildParameters.Tasks.PackageTask.IsDependentOn("Create-NuGet-Package");
-        
-
-        
-
-        _action(BuildParameters.Target);
+		_action(BuildParameters.Target);
     }
+	
+	public void RunDotNetCoreNuGet()
+    {
+        BuildParameters.IsDotNetCoreBuild = true;
+        BuildParameters.IsNuGetBuild = true;
+		SetupTasks(BuildParameters.IsDotNetCoreBuild);
+		_action(BuildParameters.Target);
+    }
+
 
     private static void SetupTasks(bool isDotNetCoreBuild)
     {

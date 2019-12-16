@@ -1,13 +1,12 @@
-// Extended by Martin Egli
-
 BuildParameters.Tasks.DotNetCorePackTask = Task("DotNetCore-Pack")
     .IsDependentOn("DotNetCore-Build")
     .WithCriteria(() => BuildParameters.ShouldRunDotNetCorePack)
     .Does(() =>
 {
     var projects = GetFiles(BuildParameters.SourceDirectoryPath + "/**/*.csproj")
-        - GetFiles(BuildParameters.SourceDirectoryPath + "/tools/**/*.csproj")
-        - GetFiles(BuildParameters.SourceDirectoryPath + "/**/*.Tests.csproj");
+        - GetFiles(BuildParameters.RootDirectoryPath + "/tools/**/*.csproj")
+        - GetFiles(BuildParameters.SourceDirectoryPath + "/**/*.Tests.csproj")
+        - GetFiles(BuildParameters.SourceDirectoryPath + "/packages/**/*.csproj");
 
     var msBuildSettings = new DotNetCoreMSBuildSettings()
                             .WithProperty("Version", BuildParameters.Version.SemVersion)
@@ -162,14 +161,32 @@ BuildParameters.Tasks.PublishMyGetPackagesTask = Task("Publish-MyGet-Packages")
     if(BuildParameters.CanPublishToMyGet)
     {
         var nupkgFiles = GetFiles(BuildParameters.Paths.Directories.NuGetPackages + "/**/*.nupkg");
+        var nugetPushSettings = new NuGetPushSettings
+            {
+                Source = BuildParameters.MyGet.SourceUrl
+            };
+
+        if(BuildParameters.ShouldPublishToMyGetWithApiKey)
+        {
+            Information("Setting ApiKey in NuGet Push Settings...");
+            nugetPushSettings.ApiKey = BuildParameters.MyGet.ApiKey;
+        }
+        else
+        {
+            var nugetSourceSettings = new NuGetSourcesSettings
+                {
+                    UserName = BuildParameters.MyGet.User,
+                    Password = BuildParameters.MyGet.Password
+                };
+
+            Information("Adding NuGet source with user/pass...");
+            NuGetAddSource("PreReleaseSource", BuildParameters.MyGet.SourceUrl, nugetSourceSettings);
+        }
 
         foreach(var nupkgFile in nupkgFiles)
         {
             // Push the package.
-            NuGetPush(nupkgFile, new NuGetPushSettings {
-                Source = BuildParameters.MyGet.SourceUrl,
-                ApiKey = BuildParameters.MyGet.ApiKey
-            });
+            NuGetPush(nupkgFile, nugetPushSettings);
         }
 
         nupkgFiles = GetFiles(BuildParameters.Paths.Directories.ChocolateyPackages + "/**/*.nupkg");
@@ -177,10 +194,7 @@ BuildParameters.Tasks.PublishMyGetPackagesTask = Task("Publish-MyGet-Packages")
         foreach(var nupkgFile in nupkgFiles)
         {
             // Push the package.
-            NuGetPush(nupkgFile, new NuGetPushSettings {
-                Source = BuildParameters.MyGet.SourceUrl,
-                ApiKey = BuildParameters.MyGet.ApiKey
-            });
+            NuGetPush(nupkgFile, nugetPushSettings);
         }
     }
     else
