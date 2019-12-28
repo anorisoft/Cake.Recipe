@@ -339,6 +339,8 @@ public static class BuildParameters
         context.Information("IsMainRepository: {0}", IsMainRepository);
         context.Information("IsPublicRepository: {0}", IsPublicRepository);
         context.Information("IsTagged: {0}", IsTagged);
+	context.Information("Repository Owner and Name [{0}]", string.Concat(repositoryOwner, "/", repositoryName));
+	context.Information("Appveyor Repository [{0}]", BuildProvider.Repository.Name);    
         context.Information("IsMasterBranch: {0}", IsMasterBranch);
         context.Information("IsDevelopBranch: {0}", IsDevelopBranch);
         context.Information("IsReleaseBranch: {0}", IsReleaseBranch);
