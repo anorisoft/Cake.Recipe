@@ -30,33 +30,33 @@ Setup<BuildData>(context =>
 		SolutionInfo.CreateSolutionInfo(context: Context);
     });
 	
-	var packageName = @"Anori.Cake.Recipe";
-	var packageList = NuGetList(packageName);
-	if (!packageList.Any())
-	{
-		Warning("No " + packageName + " package found!");
-	}
-	else if (packageList.Count() == 1)
-	{
-		var package = packageList.First();
-		if (package.Version != BuildMetaData.Version)
-		{
-			Warning("Package with version " + package.Version + " available!");
-		}
-		else
-		{
-			Debug("Package with same version " + package.Version + " found.");
-		}
-	}
-	else
-	{
-		Warning("Multible packages found!");
-		foreach(var package in packageList)
-		{
-			Warning("Found package {0}, version {1}", package.Name, package.Version);
-		}
-	}
-	
+//	var packageName = @"Anori.Cake.Recipe";
+//	var packageList = NuGetList(packageName);
+//	if (!packageList.Any())
+//	{
+//		Warning("No " + packageName + " package found!");
+//	}
+//	else if (packageList.Count() == 1)
+//	{
+//		var package = packageList.First();
+//		if (package.Version != BuildMetaData.Version)
+//		{
+//			Warning("Package with version " + package.Version + " available!");
+//		}
+//		else
+//		{
+//			Debug("Package with same version " + package.Version + " found.");
+//		}
+//	}
+//	else
+//	{
+//		Warning("Multible packages found!");
+//		foreach(var package in packageList)
+//		{
+//			Warning("Found package {0}, version {1}", package.Name, package.Version);
+//		}
+//	}
+//	
 
     Information("Building version {0} of " + BuildParameters.Title + " ({1}, {2}) using version {3} of Cake, and version {4} of Cake.Recipe. (IsTagged: {5})",
         BuildParameters.Version.SemVersion,
