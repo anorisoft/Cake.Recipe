@@ -336,12 +336,14 @@ public static class BuildParameters
         context.Information("Printing Build Parameters...");
         context.Information("IsLocalBuild: {0}", IsLocalBuild);
         context.Information("IsPullRequest: {0}", IsPullRequest);
+    context.Information("Repository Owner and Name [{0}]", string.Concat(RepositoryOwner, "/", RepositoryName));
+	context.Information("Appveyor Repository [{0}]", BuildProvider.Repository.Name);    
+	context.Information("IsMainRepository [{0}]", StringComparer.OrdinalIgnoreCase.Equals(string.Concat(repositoryOwner, "/", repositoryName), BuildProvider.Repository.Name).ToString());
+
         context.Information("IsMainRepository: {0}", IsMainRepository);
         context.Information("IsPublicRepository: {0}", IsPublicRepository);
         context.Information("IsTagged: {0}", IsTagged);
-	context.Information("Repository Owner and Name [{0}]", string.Concat(RepositoryOwner, "/", RepositoryName));
-	context.Information("Appveyor Repository [{0}]", BuildProvider.Repository.Name);    
-        context.Information("IsMasterBranch: {0}", IsMasterBranch);
+	    context.Information("IsMasterBranch: {0}", IsMasterBranch);
         context.Information("IsDevelopBranch: {0}", IsDevelopBranch);
         context.Information("IsReleaseBranch: {0}", IsReleaseBranch);
         context.Information("IsHotFixBranch: {0}", IsHotFixBranch);
