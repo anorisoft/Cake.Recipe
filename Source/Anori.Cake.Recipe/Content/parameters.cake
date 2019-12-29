@@ -565,14 +565,8 @@ public static class BuildParameters
         IsRunningOnWindows = context.IsRunningOnWindows();
         IsRunningOnAppVeyor = buildSystem.AppVeyor.IsRunningOnAppVeyor;
         IsPullRequest = BuildProvider.PullRequest.IsPullRequest;
-		
-		context.Information("Repository Owner and Name [{0}]", string.Concat(RepositoryOwner, "/", RepositoryName));
-		context.Information("Appveyor Repository [{0}]", BuildProvider.Repository.Name);    
-		context.Information("IsMainRepository [{0}]", StringComparer.OrdinalIgnoreCase.Equals(string.Concat(RepositoryOwner, "/", RepositoryName), BuildProvider.Repository.Name).ToString());
-        IsMainRepository = StringComparer.OrdinalIgnoreCase.Equals(string.Concat(repositoryOwner, "/", repositoryName), BuildProvider.Repository.Name);
-		context.Information("IsMainRepository [{0}]", IsMainRepository);
-
-        IsPublicRepository = isPublicRepository;
+		IsMainRepository = StringComparer.OrdinalIgnoreCase.Equals(string.Concat(RepositoryOwner, "/", RepositoryName), BuildProvider.Repository.Name);
+		IsPublicRepository = isPublicRepository;
         IsMasterBranch = StringComparer.OrdinalIgnoreCase.Equals(masterBranchName, BuildProvider.Repository.Branch);
         IsDevelopBranch = StringComparer.OrdinalIgnoreCase.Equals(developBranchName, BuildProvider.Repository.Branch);
         IsReleaseBranch = BuildProvider.Repository.Branch.StartsWith("release", StringComparison.OrdinalIgnoreCase);
