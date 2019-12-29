@@ -338,7 +338,7 @@ public static class BuildParameters
         context.Information("IsPullRequest: {0}", IsPullRequest);
     context.Information("Repository Owner and Name [{0}]", string.Concat(RepositoryOwner, "/", RepositoryName));
 	context.Information("Appveyor Repository [{0}]", BuildProvider.Repository.Name);    
-	context.Information("IsMainRepository [{0}]", StringComparer.OrdinalIgnoreCase.Equals(string.Concat(repositoryOwner, "/", repositoryName), BuildProvider.Repository.Name).ToString());
+	context.Information("IsMainRepository [{0}]", StringComparer.OrdinalIgnoreCase.Equals(string.Concat(RepositoryOwner, "/", RepositoryName), BuildProvider.Repository.Name).ToString());
 
         context.Information("IsMainRepository: {0}", IsMainRepository);
         context.Information("IsPublicRepository: {0}", IsPublicRepository);
