@@ -570,6 +570,7 @@ public static class BuildParameters
 		context.Information("Appveyor Repository [{0}]", BuildProvider.Repository.Name);    
 		context.Information("IsMainRepository [{0}]", StringComparer.OrdinalIgnoreCase.Equals(string.Concat(RepositoryOwner, "/", RepositoryName), BuildProvider.Repository.Name).ToString());
         IsMainRepository = StringComparer.OrdinalIgnoreCase.Equals(string.Concat(repositoryOwner, "/", repositoryName), BuildProvider.Repository.Name);
+		context.Information("IsMainRepository [{0}]", IsMainRepository);
 
         IsPublicRepository = isPublicRepository;
         IsMasterBranch = StringComparer.OrdinalIgnoreCase.Equals(masterBranchName, BuildProvider.Repository.Branch);
