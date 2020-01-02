@@ -68,7 +68,7 @@ Setup<BuildData>(context =>
 
     if(BuildParameters.Version.CakeVersion != currentSupportedCakeVersionNumber)
     {
-        throw new Exception(string.Format("Cake.Recipe currently only supports building projects using version {0} of Cake.  Please update your packages.config file (or whatever method is used to pin to a specific version of Cake) to use this version.", currentSupportedCakeVersionNumber));
+ //       throw new Exception(string.Format("Cake.Recipe currently only supports building projects using version {0} of Cake.  Please update your packages.config file (or whatever method is used to pin to a specific version of Cake) to use this version.", currentSupportedCakeVersionNumber));
     }
 
     return new BuildData(context);
@@ -290,16 +290,36 @@ BuildParameters.Tasks.DotNetCoreBuildTask = Task("DotNetCore-Build")
 public void CopyBuildOutput()
 {
     Information("Copying build output...");
-
-    foreach(var project in ParseSolution(BuildParameters.SolutionFilePath).GetProjects())
+	foreach(var project in ParseSolution(BuildParameters.SolutionFilePath).Projects)
+    {
+		Information(project.Path.FullPath.ToString());
+		Information("Type {0}", project.Type);
+		if (project.Type == "{2150E333-8FDC-42A3-9474-1A3956D46DE8}")
+		{
+			continue;
+		}
+		Information("Input BuildPlatformTarget: {0}", ToolSettings.BuildPlatformTarget.ToString());
+        var platformTarget = ToolSettings.BuildPlatformTarget == PlatformTarget.MSIL ? "AnyCPU" : ToolSettings.BuildPlatformTarget.ToString();
+        Information("Using BuildPlatformTarget: {0}", platformTarget);
+        
+		var parsedProject = ParseProject(project.Path, BuildParameters.Configuration, platformTarget);
+		Information("IsNetStandard: {0}", parsedProject.IsNetStandard);
+ 		Information("IsNetFramework: {0}", parsedProject.IsNetFramework);
+ 		Information("IsNetCore: {0}", parsedProject.IsNetCore);
+	}
+	
+    foreach(var project in ParseSolution(BuildParameters.SolutionFilePath).Projects)
     {
         // There is quite a bit of duplication in this function, that really needs to be tidied Upload
-
+		if (project.Type == "{2150E333-8FDC-42A3-9474-1A3956D46DE8}")
+		{
+			continue;
+		}
         Information("Input BuildPlatformTarget: {0}", ToolSettings.BuildPlatformTarget.ToString());
         var platformTarget = ToolSettings.BuildPlatformTarget == PlatformTarget.MSIL ? "AnyCPU" : ToolSettings.BuildPlatformTarget.ToString();
         Information("Using BuildPlatformTarget: {0}", platformTarget);
         var parsedProject = ParseProject(project.Path, BuildParameters.Configuration, platformTarget);
-
+		
         if(project.Path.FullPath.ToLower().Contains("wixproj"))
         {
             Warning("Skipping wix project");

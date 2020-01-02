@@ -1,5 +1,6 @@
 BuildParameters.Tasks.DotNetCorePackTask = Task("DotNetCore-Pack")
     .IsDependentOn("DotNetCore-Build")
+    .IsDependentOn("CodeDocumentation")
     .WithCriteria(() => BuildParameters.ShouldRunDotNetCorePack)
     .Does(() =>
 {

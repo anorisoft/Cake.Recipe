@@ -8,16 +8,8 @@ BuildParameters.Tasks.CleanDocumentationTask = Task("Clean-Documentation")
     EnsureDirectoryExists(BuildParameters.WyamPublishDirectoryPath);
 });
 
-BuildParameters.Tasks.DeployGraphDocumentation = Task("Deploy-Graph-Documentation")
-    .WithCriteria(() => BuildParameters.ShouldDeployGraphDocumentation)
-    .WithCriteria(() => DirectoryExists(BuildParameters.WyamRootDirectoryPath))
-    .Does(() => {
-        Graph(Tasks).Deploy();
-    });
-
 BuildParameters.Tasks.PublishDocumentationTask = Task("Publish-Documentation")
     .IsDependentOn("Clean-Documentation")
-    .IsDependentOn("Deploy-Graph-Documentation")
     .WithCriteria(() => BuildParameters.ShouldGenerateDocumentation)
     .WithCriteria(() => DirectoryExists(BuildParameters.WyamRootDirectoryPath))
     .Does(() => RequireTool(WyamTool, () => {
@@ -82,7 +74,6 @@ BuildParameters.Tasks.PublishDocumentationTask = Task("Publish-Documentation")
 });
 
 BuildParameters.Tasks.PreviewDocumentationTask = Task("Preview-Documentation")
-    .IsDependentOn("Deploy-Graph-Documentation")
     .WithCriteria(() => DirectoryExists(BuildParameters.WyamRootDirectoryPath))
     .Does(() => RequireTool(WyamTool, () => {
         Wyam(new WyamSettings
@@ -110,7 +101,6 @@ BuildParameters.Tasks.PreviewDocumentationTask = Task("Preview-Documentation")
 
 BuildParameters.Tasks.ForcePublishDocumentationTask = Task("Force-Publish-Documentation")
     .IsDependentOn("Clean-Documentation")
-    .IsDependentOn("Deploy-Graph-Documentation")
     .WithCriteria(() => DirectoryExists(BuildParameters.WyamRootDirectoryPath))
     .Does(() => RequireTool(WyamTool, () => {
         Wyam(new WyamSettings
