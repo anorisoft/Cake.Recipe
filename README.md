@@ -4,13 +4,12 @@
 `Anori.Cake.Recipe` is a set of convention based Cake scripts.
 More about Cake at http://cakebuild.net
 
-[![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/cake-contrib/Cake.Recipe/blob/develop/LICENSE)
+[![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/anorisoft/Cake.Recipe/blob/develop/LICENSE)
 
 ## Information
 
 | | Stable | Pre-release |
 |:--:|:--:|:--:|
-|GitHub Release|-|[![GitHub release](https://img.shields.io/github/release/anorisoft/Cake.Recipe.svg)](https://github.com/anorisoft/Cake.Recipe/releases/latest)|
 |NuGet|[![NuGet](https://img.shields.io/nuget/v/Anori.Cake.Recipe.svg)](https://www.nuget.org/packages/Anori.Cake.Recipe)|[![NuGet](https://img.shields.io/nuget/vpre/Anori.Cake.Recipe.svg)](https://www.nuget.org/packages/Anori.Cake.Recipe)|
 
 ## Build Status
@@ -22,7 +21,6 @@ More about Cake at http://cakebuild.net
 
 ## Quick Links
 
-- [Documentation](https://anori.github.io/Cake.Recipe)
 - [Documentation](https://cake-contrib.github.io/Cake.Recipe)
 
 ## Chat Room
