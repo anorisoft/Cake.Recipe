@@ -1,7 +1,7 @@
-# Cake.Recipe
-=======
+# Anori.Cake.Recipe
 
-`Cake.Recipe` is a set of convention based Cake scripts.
+`Anori.Cake.Recipe` is a fork of `Cake.Recipe`
+`Anori.Cake.Recipe` is a set of convention based Cake scripts.
 More about Cake at http://cakebuild.net
 
 [![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/cake-contrib/Cake.Recipe/blob/develop/LICENSE)
@@ -33,6 +33,11 @@ Come join in the conversation about Cake Recipe in our Gitter Chat Room
 ## Build
 
 To build this package we are using Cake.
+On Windows Commandline run:
+
+```batch
+./run.cmd
+```
 
 On Windows PowerShell run:
 
