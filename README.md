@@ -4,7 +4,7 @@
 `Anori.Cake.Recipe` is a set of convention based Cake scripts.
 More about Cake at http://cakebuild.net
 
-[![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/anorisoft/Cake.Recipe/blob/develop/LICENSE)
+[![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/anorisoft/Cake.Recipe/blob/master/LICENSE)
 
 ## Information
 
