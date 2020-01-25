@@ -1,5 +1,4 @@
 # Cake.Recipe
-<<<<<<< HEAD
 =======
 
 `Cake.Recipe` is a set of convention based Cake scripts.
@@ -46,4 +45,3 @@ On OSX/Linux run:
 ```bash
 ./build.sh
 ```
->>>>>>> Develop
