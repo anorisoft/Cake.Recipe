@@ -58,7 +58,7 @@ Setup<BuildData>(context =>
 //	}
 //	
 
-    Information("Building version {0} of " + BuildParameters.Title + " ({1}, {2}) using version {3} of Cake, and version {4} of Cake.Recipe. (IsTagged: {5})",
+    Information("Building version {0} of " + BuildParameters.Title + " ({1}, {2}) using version {3} of Cake, and version {4} of Anorisoft.Cake.Recipe. (IsTagged: {5})",
         BuildParameters.Version.SemVersion,
         BuildParameters.Configuration,
         BuildParameters.Target,
