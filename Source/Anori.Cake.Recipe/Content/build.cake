@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 var publishingError = false;
-var currentSupportedCakeVersionNumber = "0.32.1.0";
+var currentSupportedCakeVersionNumber = "0.36.0.0";
 
 ///////////////////////////////////////////////////////////////////////////////
 // SETUP / TEARDOWN
@@ -290,16 +290,36 @@ BuildParameters.Tasks.DotNetCoreBuildTask = Task("DotNetCore-Build")
 public void CopyBuildOutput()
 {
     Information("Copying build output...");
-
-    foreach(var project in ParseSolution(BuildParameters.SolutionFilePath).GetProjects())
+	foreach(var project in ParseSolution(BuildParameters.SolutionFilePath).Projects)
+    {
+		Information(project.Path.FullPath.ToString());
+		Information("Type {0}", project.Type);
+		if (project.Type == "{2150E333-8FDC-42A3-9474-1A3956D46DE8}")
+		{
+			continue;
+		}
+		Information("Input BuildPlatformTarget: {0}", ToolSettings.BuildPlatformTarget.ToString());
+        var platformTarget = ToolSettings.BuildPlatformTarget == PlatformTarget.MSIL ? "AnyCPU" : ToolSettings.BuildPlatformTarget.ToString();
+        Information("Using BuildPlatformTarget: {0}", platformTarget);
+        
+		var parsedProject = ParseProject(project.Path, BuildParameters.Configuration, platformTarget);
+		Information("IsNetStandard: {0}", parsedProject.IsNetStandard);
+ 		Information("IsNetFramework: {0}", parsedProject.IsNetFramework);
+ 		Information("IsNetCore: {0}", parsedProject.IsNetCore);
+	}
+	
+    foreach(var project in ParseSolution(BuildParameters.SolutionFilePath).Projects)
     {
         // There is quite a bit of duplication in this function, that really needs to be tidied Upload
-
+		if (project.Type == "{2150E333-8FDC-42A3-9474-1A3956D46DE8}")
+		{
+			continue;
+		}
         Information("Input BuildPlatformTarget: {0}", ToolSettings.BuildPlatformTarget.ToString());
         var platformTarget = ToolSettings.BuildPlatformTarget == PlatformTarget.MSIL ? "AnyCPU" : ToolSettings.BuildPlatformTarget.ToString();
         Information("Using BuildPlatformTarget: {0}", platformTarget);
         var parsedProject = ParseProject(project.Path, BuildParameters.Configuration, platformTarget);
-
+		
         if(project.Path.FullPath.ToLower().Contains("wixproj"))
         {
             Warning("Skipping wix project");

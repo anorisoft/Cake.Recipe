@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Anori.Cake.Recipe</id>
-    <version>0.1.35</version>
+    <version>0.0.0</version>
     <authors>Martin Egli</authors>
     <owners>Martin Egli</owners>
     <description>Re-usable build script for Cake that can be used for numerous projects.</description>

@@ -10,6 +10,8 @@
 
 void SetupDocFxEnvironment(){
 	Debug("SetupDocFxEnvironment");
+//	RequireTool(PlantUmlClassDiagramGeneratorTool, () => 
+//	{});
 	RequireTool(WkHtmlToPdfTool, () => 
 	{
 		var path = EnvironmentVariable("PATH");
