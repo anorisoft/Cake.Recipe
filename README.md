@@ -22,6 +22,7 @@ More about Cake at http://cakebuild.net
 
 ## Quick Links
 
+- [Documentation](https://anori.github.io/Cake.Recipe)
 - [Documentation](https://cake-contrib.github.io/Cake.Recipe)
 
 ## Chat Room
