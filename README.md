@@ -11,7 +11,7 @@ More about Cake at http://cakebuild.net
 | | Stable | Pre-release |
 |:--:|:--:|:--:|
 |GitHub Release|-|[![GitHub release](https://img.shields.io/github/release/anorisoft/Cake.Recipe.svg)](https://github.com/anorisoft/Cake.Recipe/releases/latest)|
-|NuGet|[![NuGet](https://img.shields.io/nuget/v/Cake.Recipe.svg)](https://www.nuget.org/packages/Anori.Cake.Recipe)|[![NuGet](https://img.shields.io/nuget/vpre/Cake.Recipe.svg)](https://www.nuget.org/packages/Anori.Cake.Recipe)|
+|NuGet|[![NuGet](https://img.shields.io/nuget/v/Anori.Cake.Recipe.svg)](https://www.nuget.org/packages/Anori.Cake.Recipe)|[![NuGet](https://img.shields.io/nuget/vpre/Anori.Cake.Recipe.svg)](https://www.nuget.org/packages/Anori.Cake.Recipe)|
 
 ## Build Status
 
